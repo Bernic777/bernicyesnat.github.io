@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bernic Yesnat - Perawat Profesional & Pegiat Cybersecurity Kesehatan</title>
+    <!-- Memuat Tailwind CSS untuk styling cepat dan responsif --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Lucide Icons untuk ikon visual --><script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* --- CSS LOADING SCREEN LAMA (HAPUS) --- */
+        /* CSS #loading-screen, #main-content, etc. telah dihapus */
+
+        /* --- CSS BARU UNTUK EKG BAR DI BAWAH --- */
+        /* Gaya Teks (Hijau Neon) */
+        .rhythm-display {
+            /* PERUBAHAN: Warna diubah ke Hijau Tema Primer (nurse-green) */
+            color: var(--primary-color); 
+            /* PERUBAHAN: Efek neon diubah agar lebih halus dan hijau */
+            text-shadow: 0 0 5px var(--secondary-color), 0 0 10px var(--primary-color);
+            font-size: 1.2em; /* Sedikit lebih kecil */
+            font-weight: bold;
+            min-height: 1.5em; 
+            /* BARU: Posisi di atas monitor EKG */
+            position: absolute;
+            /* PERUBAHAN: Diposisikan di ATAS kontainer EKG */
+            bottom: 100%; /* Menempatkan di atas kontainer */
+            margin-bottom: 5px; /* Jarak 5px di atas kontainer */
+            /* PERUBAHAN: Dipindahkan ke kiri */
+            left: 20px;
+            transform: none; /* Menghapus transform translateX */
+            z-index: 7; /* Di atas SVG */
+        }
+
+        /* BARU: Kontainer untuk EKG di bawah */
+        .ekg-waves-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 15vh; /* Tinggi yang sama dengan ombak sebelumnya */
+            min-height: 100px;
+            max-height: 250px;
+            z-index: 5; /* z-index yang sama dengan ombak sebelumnya */
+            /* PERUBAHAN: Latar belakang hitam dan border dihapus (menjadi transparan) */
+            background-color: transparent; 
+            /* PERBAIKAN: Menghapus 'overflow: hidden' agar teks di atasnya (rhythm-display) terlihat */
+            /* overflow: hidden; */
+        }
+
+        .ekg-waves-container svg {
+            width: 100%;
+            height: 100%; /* SVG mengisi kontainer */
+            display: block;
+            margin: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .ekg-waves-container svg .ekg {
+            fill: none;
+            /* PERUBAHAN: Warna stroke diubah ke Hijau Tema Primer */
+            stroke: var(--primary-color);
+            stroke-width: 2; /* Sedikit ditipiskan agar lebih tajam dan realistis */
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            /* PERUBAHAN: Opacity 1 agar selalu terlihat */
+            opacity: 1;
+            /* PERUBAHAN: Mengatur dasharray dan offset untuk animasi scroll */
+            stroke-dasharray: 1000; 
+            stroke-dashoffset: 1000;
+            /* PERUBAHAN: Menggunakan animasi 'ekg-scroll' baru */
+            animation: ekg-scroll 4s linear infinite; /* Diperlambat sedikit agar lebih jelas */
+        }
+        
+        .ekg.flatline {
+            animation: none;
+            opacity: 1; 
+            stroke-dashoffset: 0;
+            /* PERUBAHAN: Pastikan flatline tidak memiliki dasharray */
+            stroke-dasharray: none; 
+        }
+
+        /* PERUBAHAN: Keyframes diganti menjadi 'ekg-scroll' */
+        @keyframes ekg-scroll {
+            from {
+                stroke-dashoffset: 1000; /* Mulai dari offset */
+            }
+            to {
+                stroke-dashoffset: 0; /* Selesai di 0 (scroll penuh) */
+            }
+        }
+        /* --- AKHIR DARI CSS EKG BAR --- */
+
+
+        /* --- CSS PORTFOLIO UTAMA --- */
+        :root {
+            --primary-color: #38761d; /* Hijau Keperawatan */
+            --secondary-color: #93c47d; /* Hijau Muda */
+            --navbar-height: 64px; /* Tinggi navbar (h-16) */
+            
+            /* Variabel EKG Visualisasi Atas */
+            --bg: transparent; 
+            --grid: rgba(56, 118, 29, 0.07);
+            --line: var(--primary-color);
+            --accent: var(--primary-color);
+            --muted: var(--primary-color);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            /* Transisi halus untuk perubahan warna latar belakang */
+            transition: background-color 1.5s ease-in-out;
+        }
+        /* Warna hangat alternatif untuk body */
+        body.warm-bg {
+            background-color: #FFFBF5; /* Warna krem/linen muda */
+        }
+        
+        /* Menggunakan warna custom Tailwind */
+        .bg-primary { background-color: var(--primary-color); }
+        .text-primary { color: var(--primary-color); }
+        .border-primary { border-color: var(--primary-color); }
+        .bg-secondary { background-color: var(--secondary-color); }
+        .text-secondary { color: var(--secondary-color); }
+        .bg-nurse-light { background-color: var(--secondary-color); }
+        .text-nurse-light { color: var(--secondary-color); }
+
+        /* CSS BARU UNTUK TOMBOL LINKEDIN */
+        .bg-linkedin { background-color: #0A66C2; } /* LinkedIn Blue */
+        .hover\:bg-linkedin-dark:hover { background-color: #004182; }
+        /* AKHIR CSS LINKEDIN */
+
+        /* Styling untuk efek hover pada navigasi */
+        .nav-link:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Utility untuk icon Lucide */
+        .icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        /* Kelas untuk transisi fade-in (Logika Baru) */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            will-change: opacity, transform;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Perbaikan: Memastikan tautan menu mobile muncul di atas konten lain */
+        #mobile-menu a {
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+        
+        /* Tambahan: Shadow pada hover untuk peningkatan kepuasan visual */
+        .card-hover:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* CSS BARU UNTUK ANIMASI BORDER FOTO */
+        .photo-pulse {
+            /* Menerapkan animasi 'pulse' */
+            /* Ini akan berjalan di atas 'shadow-lg' dan 'border-nurse-green' */
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                /* Dimulai dan diakhiri dengan bayangan yang sedikit terlihat */
+                box-shadow: 0 0 0 0 rgba(56, 118, 29, 0.4); /* Warna nurse-green (primary) dengan transparansi */
+            }
+            70% {
+                /* Puncak animasi, bayangan melebar dan menghilang */
+                box-shadow: 0 0 0 12px rgba(56, 118, 29, 0); /* Melebar hingga 12px dan transparan penuh */
+            }
+        }
+        /* AKHIR DARI CSS ANIMASI BORDER FOTO */
+
+        /* CSS BARU UNTUK OMBAK SVG */
+        /* CSS .waves (untuk ombak bawah) telah DIHAPUS */
+        
+        /* CSS BARU UNTUK OMBAK DI BAGIAN ATAS (TETAP ADA) */
+        .waves-top {
+            position: absolute;
+            top: 0; /* Menempel di atas */
+            left: 0;
+            width: 100%;
+            height: 15vh; /* Tinggi ombak */
+            min-height: 100px;
+            max-height: 250px;
+            z-index: 5; /* Sama dengan ombak bawah */
+            transform: rotate(180deg); /* Membalik ombak */
+        }
+
+
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax > use:nth-child(1) {
+            animation-delay: -2s;
+            animation-duration: 7s;
+            /* Menggunakan --primary-color (nurse-green) dengan transparansi */
+            fill: rgba(56, 118, 29, 0.7); 
+        }
+        .parallax > use:nth-child(2) {
+            animation-delay: -3s;
+            animation-duration: 10s;
+             /* Menggunakan --secondary-color (nurse-light) dengan transparansi */
+            fill: rgba(147, 196, 125, 0.5);
+        }
+        .parallax > use:nth-child(3) {
+            animation-delay: -4s;
+            animation-duration: 13s;
+            fill: rgba(56, 118, 29, 0.3);
+        }
+        .parallax > use:nth-child(4) {
+            animation-delay: -5s;
+            animation-duration: 20s;
+            fill: rgba(147, 196, 125, 0.1);
+        }
+
+        @keyframes move-forever {
+            0% {
+                transform: translate3d(-90px, 0, 0);
+            }
+            100% {
+                transform: translate3d(85px, 0, 0);
+            }
+        }
+        /* AKHIR DARI CSS OMBAK */
+
+        /* CSS BARU UNTUK BURUNG TERBANG (REALISTIS) - MENGGANTIKAN YANG LAMA */
+        .bird {
+            background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/174479/bird-cells.svg);
+            background-size: auto 100%;
+            width: 88px;
+            height: 125px;
+            will-change: background-position;
+            animation-name: fly-cycle;
+            animation-timing-function: steps(10);
+            animation-iteration-count: infinite;
+            /* ADAPTASI: Mengubah warna burung dari hitam ke hijau */
+            filter: invert(34%) sepia(87%) saturate(838%) hue-rotate(58deg) brightness(96%) contrast(88%);
+            opacity: 0.7;
+        }
+
+        .bird--one {
+            animation-duration: 1s;
+            animation-delay: -0.5s;
+        }
+
+        .bird--two {
+            animation-duration: 0.9s;
+            animation-delay: -0.75s;
+        }
+
+        .bird--three {
+            animation-duration: 1.25s;
+            animation-delay: -0.25s;
+        }
+
+        .bird--four {
+            animation-duration: 1.1s;
+            animation-delay: -0.5s;
+        }
+
+        .bird-container {
+            position: absolute;
+            top: 20%;
+            left: -10%;
+            transform: scale(0) translateX(-10vw);
+            will-change: transform;
+            animation-name: fly-right-one;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            /* ADAPTASI: Memastikan burung di belakang konten */
+            z-index: 10; 
+            pointer-events: none;
+        }
+
+        .bird-container--one {
+            animation-duration: 15s;
+            animation-delay: 0;
+        }
+
+        .bird-container--two {
+            animation-duration: 16s;
+            animation-delay: 1s;
+        }
+
+        .bird-container--three {
+            animation-duration: 14.6s;
+            animation-delay: 9.5s;
+        }
+
+        .bird-container--four {
+            animation-duration: 16s;
+            animation-delay: 10.25s;
+        }
+
+        @keyframes fly-cycle {
+            100% {
+                background-position: -900px 0;
+            }
+        }
+
+        @keyframes fly-right-one {
+            0% {
+                transform: scale(0.3) translateX(-10vw);
+            }
+            10% {
+                transform: translateY(2vh) translateX(10vw) scale(0.4);
+            }
+            20% {
+                transform: translateY(0vh) translateX(30vw) scale(0.5);
+            }
+            30% {
+                transform: translateY(4vh) translateX(50vw) scale(0.6);
+            }
+            40% {
+                transform: translateY(2vh) translateX(70vw) scale(0.6);
+            }
+            50% {
+                transform: translateY(0vh) translateX(90vw) scale(0.6);
+            }
+            60% {
+                transform: translateY(0vh) translateX(110vw) scale(0.6);
+            }
+            100% {
+                transform: translateY(0vh) translateX(110vw) scale(0.6);
+            }
+        }
+        /* AKHIR DARI CSS BURUNG BARU */
+
+        /* CSS BARU UNTUK STETOSKOP & SIMBOL MENGAPUNG (Hanya Desktop) */
+        .floating-item {
+            position: absolute;
+            z-index: 15; /* Di atas ombak (5) & burung (10), di bawah teks (20) */
+            /* PERUBAHAN: Menerapkan filter hijau agar sesuai tema (seperti burung) */
+            filter: invert(34%) sepia(87%) saturate(838%) hue-rotate(58deg) brightness(96%) contrast(88%);
+            opacity: 0.7; /* Menyesuaikan opacity agar sama dengan burung */
+            animation: float 6s ease-in-out infinite;
+            will-change: transform;
+            /* Sembunyikan di HP */
+            display: none;
+        }
+        
+        /* Hanya tampilkan di layar besar (lg) */
+        @media (min-width: 1024px) {
+            .floating-item {
+                display: block;
+            }
+        }
+
+        /* Posisi dan ukuran individual - DIATUR ULANG UNTUK 4 ITEM */
+        #float-stethoscope {
+            top: 25%;
+            left: 15%; /* Kiri atas */
+            width: 80px;
+            height: 80px;
+            animation-duration: 7s; /* Durasi berbeda agar tidak sinkron */
+        }
+        #float-plus {
+            top: 30%;
+            right: 15%; /* Kanan atas */
+            width: 50px;
+            height: 50px;
+            animation-delay: -2s; /* Delay berbeda */
+            animation-duration: 5s;
+        }
+        #float-umbrella {
+            top: 55%;
+            left: 20%; /* Kiri bawah (Gembok/Perlindungan) */
+            width: 60px;
+            height: 60px;
+            animation-delay: -4s;
+            animation-duration: 6s;
+            /* PERUBAHAN: Menghapus warna/opacity, diatur oleh .floating-item */
+        }
+        /* BARU: Ikon Suntik */
+        #float-syringe {
+            top: 60%;
+            right: 18%; /* Kanan bawah */
+            width: 70px;
+            height: 70px;
+            animation-delay: -1s;
+            animation-duration: 8s;
+        }
+
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                /* Bergerak naik/turun dan sedikit berputar */
+                transform: translateY(-20px) rotate(-8deg);
+            }
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+        }
+        /* AKHIR DARI CSS STETOSKOP MENGAPUNG */
+
+        /* CSS BARU UNTUK SCROLL HIGHLIGHT */
+
+        /* 1. Animasi Highlight "KARAOKE" Khusus (Lebih Lambat) */
+        @keyframes karaoke-wipe {
+            from {
+                background-position: 100%;
+            }
+            to {
+                background-position: 0;
+            }
+        }
+
+        .karaoke-highlight {
+            background: linear-gradient(
+                to right,
+                rgba(147, 196, 125, 0.7) 50%, /* var(--secondary-color) dengan 70% opacity */
+                rgba(147, 196, 125, 0) 50%
+            );
+            background-position: 100%; /* Mulai dari 'tidak terlihat' */
+            background-size: 200% 100%;
+            border-radius: 0.125rem;
+            padding-inline: 0.125rem;
+            background-color: transparent;
+            color: inherit;
+            /* Menerapkan animasi karaoke yang lambat */
+            animation: karaoke-wipe 2.5s linear forwards; /* 2.5 detik */
+            /* PERUBAHAN: Jeda dihapus, akan dipicu oleh JS 'onFirstScroll' */
+            /* animation-delay: 0.5s; */ 
+        }
+
+        /* 2. Animasi Highlight "STANDAR" (Dipicu oleh JS) */
+        /* PERUBAHAN: Menghapus 'animation-timeline' */
+        mark:not(.karaoke-highlight) {
+            background: linear-gradient(
+                to right,
+                rgba(147, 196, 125, 0.7) 50%, /* var(--secondary-color) dengan 70% opacity */
+                rgba(147, 196, 125, 0) 50%
+            );
+            background-position: 100%; /* Mulai dari 'tidak terlihat' */
+            background-size: 200% 100%;
+            border-radius: 0.125rem;
+            padding-inline: 0.125rem;
+            background-color: transparent; 
+            color: inherit;
+            /* Transisi "pelan" 1.5 detik */
+            transition: background-position 1.5s ease;
+        }
+
+        /* Kelas ini ditambahkan oleh JS untuk memicu transisi */
+        mark:not(.karaoke-highlight).highlight-reveal {
+            background-position: 0;
+        }
+        /* AKHIR DARI CSS SCROLL HIGHLIGHT */
+
+        /* CSS BARU DARI EFEK SLIDER (DITERAPKAN HANYA PADA FOTO) */
+        .hero-content-block {
+            position: relative;
+            overflow: hidden; /* Penting untuk circle-light */
+            border-radius: 9999px; /* rounded-full */
+            padding: 1.5rem; /* p-6 - Padding untuk area hover */
+            background-color: rgba(255, 255, 255, 0.8);
+            /* Efek 'blur' dari CSS Anda */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            /* Efek 'box-shadow' dari CSS Anda */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.5s ease;
+            /* PERUBAHAN: Dibuat inline-block agar pas dengan foto */
+            display: inline-block;
+        }
+
+        .hero-content-block:hover {
+            /* Efek hover 'box-shadow' dari CSS Anda */
+            box-shadow: 0px 0px 50px #333;
+        }
+
+        .circle-light {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            /* Efek 'radial-gradient' dari CSS Anda */
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.7), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none; /* Agar tidak menghalangi mouse */
+            transform: translate(-50%, -50%); /* Memusatkan di kursor */
+            /* Posisi diatur oleh JS menggunakan var() */
+            top: var(--light-y, 50%);
+            left: var(--light-x, 50%);
+        }
+
+        .hero-content-block:hover .circle-light {
+            /* Efek hover 'opacity' dari CSS Anda */
+            opacity: 0.3;
+        }
+        /* AKHIR DARI CSS EFEK SLIDER */
+
+        /* CSS BARU UNTUK TOMBOL AKSI MENGAMBANG (FAB) */
+        .floating-action-buttons {
+            position: fixed;
+            bottom: 2rem; /* 32px */
+            right: 2rem; /* 32px */
+            z-index: 40; /* Di bawah navbar (50) tapi di atas konten */
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem; /* 12px */
+        }
+        .fab-button {
+            width: 3.5rem; /* 56px */
+            height: 3.5rem; /* 56px */
+            border-radius: 9999px; /* rounded-full */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease-out;
+        }
+        .fab-button:hover {
+            transform: scale(1.05);
+        }
+        /* AKHIR DARI CSS FAB */
+
+        /* CSS BARU UNTUK MODAL CV */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 50; /* Paling atas */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        /* AKHIR DARI CSS MODAL */
+        
+        /* CSS UNTUK KONTROL EKG (VISUALISASI ATAS) */
+        #ekg-simulator-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 5; 
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            padding: 1rem;
+            border-top: 1px solid rgba(56, 118, 29, 0.1);
+        }
+        .ekg-controls-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px; 
+            flex-wrap: wrap; 
+        }
+        .ekg-controls-header h2 {
+            font-size: 1rem; 
+            font-weight: 600;
+            margin: 0;
+            color: var(--line);
+        }
+        .ekg-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap; 
+        }
+        .ekg-controls label {
+             font-size: 0.875rem; 
+             color: var(--muted);
+        }
+        .ekg-controls button,
+        .ekg-controls select,
+        .ekg-controls input[type=range] {
+            background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid rgba(56, 118, 29, 0.2); 
+            color: var(--muted);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        .ekg-controls button {
+            cursor: pointer;
+        }
+        .ekg-controls span#bpmLabel {
+            font-size: 0.875rem;
+            color: var(--muted);
+            min-width: 50px;
+        }
+        .ekg-canvas-wrap {
+            border-radius: 8px;
+            border: 1px solid rgba(56, 118, 29, 0.1);
+        }
+        .ekg-canvas-wrap svg {
+            width: 100%;
+            height: 200px;
+            display: block;
+            overflow: visible;
+        }
+        .marker {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 1.2;
+            stroke-dasharray: 3 3;
+        }
+        .marker-text {
+             fill: var(--accent);
+             font-size: 12px;
+             text-anchor: middle;
+        }
+        .ekg-labels {
+            position: relative;
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+        .ekg-legend {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .ekg-chip {
+            font-size: 11px;
+            padding: 4px 6px;
+            background: rgba(56, 118, 29, 0.05); 
+            border-radius: 6px;
+            border: 1px solid rgba(56, 118, 29, 0.1);
+        }
+
+
+    </style>
+    <!-- Konfigurasi Tailwind untuk warna dan font (opsional) --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'nurse-green': '#38761d',
+                        'nurse-light': '#93c47d',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- BARU: JSON-LD Structured Data untuk Sitelink & SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Portofolio Profesional Bernic Yesnat",
+      "description": "Portofolio profesional Ns. Bernic Yesnat, S.Kep., seorang perawat dengan minat khusus pada cybersecurity kesehatan, AI, dan keamanan data pasien.",
+      "url": "https://www.bernicyesnat.icu/",
+      "mainEntity": {
+        "@type": "Person",
+        "name": "Ns. Bernic Yesnat, S.Kep.",
+        "alternateName": "Bernic Yesnat",
+        "jobTitle": "Perawat Profesional & Inisiator Teknologi Kesehatan",
+        "image": "https://www.bernicyesnat.icu/android-chrome-192x192.png", 
+        "url": "https://www.bernicyesnat.icu/",
+        "sameAs": [
+          "https://www.linkedin.com/in/yesnat-bernic-332b562b3/",
+          "https://wa.me/6285823003035",
+          "https://certificate.bernicyesnat.icu/"
+        ],
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "Universitas Klabat"
+        }
+      },
+      "hasPart": [
+        { "@type": "WebPageElement", "name": "Profil", "url": "https://www.bernicyesnat.icu/#profile" },
+        { "@type": "WebPageElement", "name": "Pendidikan", "url": "https://www.bernicyesnat.icu/#education" },
+        { "@type": "WebPageElement", "name": "Keahlian", "url": "https://www.bernicyesnat.icu/#skills" },
+        { "@type": "WebPageElement", "name": "Pengalaman", "url": "https://www.bernicyesnat.icu/#experience" },
+        { "@type": "WebPageElement", "name": "Sertifikasi", "url": "https://www.bernicyesnat.icu/#certs" },
+        { "@type": "WebPageElement", "name": "Kontak", "url": "https://www.bernicyesnat.icu/#contact" }
+      ]
+    }
+    </script>
+    <meta name="description" content="Portofolio profesional Ns. Bernic Yesnat, S.Kep., seorang perawat dengan minat khusus pada cybersecurity kesehatan, AI, dan keamanan data pasien.">
+</head>
+<body class="text-gray-800" style="background-color: #f7f7ff;"> <!-- Menetapkan warna default body -->
+
+    <!-- LOADING SCREEN TELAH DIHAPUS DARI SINI -->
+
+    <!-- KONTEN UTAMA (ID MAIN-CONTENT DIHAPUS) -->
+
+    <!-- Navbar --><nav class="sticky top-0 z-50 bg-white shadow-lg" id="main-navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- PERUBAHAN: Nama dan Jam dibungkus dalam div --><div class="flex-shrink-0 flex items-baseline space-x-2 md:space-x-3">
+                    <a href="#home" class="text-xl font-bold text-nurse-green">Ns. Bernic Yesnat, S.Kep.</a>
+                    <!-- JAM OTOMATIS BARU --><!-- PERUBAHAN: Menghapus 'hidden' dan 'sm:' agar selalu terlihat --><span id="live-clock-time" class="text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md px-2 py-0.5 inline-block" title="Waktu Lokal Anda"></span>
+                </div>
+                
+                <div class="hidden md:flex space-x-4">
+                    <!-- Tautan Navbar Diperbarui --><a href="#profile" class="nav-link text-gray-600 hover:text-nurse-green px-3 py-2 rounded-md text-sm font-medium">Profil</a>
+                    <a href="#education" class="nav-link text-gray-600 hover:text-nurse-green px-3 py-2 rounded-md text-sm font-medium">Pendidikan</a>
+                    <a href="#skills" class="nav-link text-gray-600 hover:text-nurse-green px-3 py-2 rounded-md text-sm font-medium">Keahlian</a>
+                    <a href="#experience" class="nav-link text-gray-600 hover:text-nurse-green px-3 py-2 rounded-md text-sm font-medium">Pengalaman</a>
+                    <a href="#certs" class="nav-link text-gray-600 hover:text-nurse-green px-3 py-2 rounded-md text-sm font-medium">Sertifikasi</a>
+                    <a href="#contact" class="nav-link text-gray-600 hover:text-nurse-green px-3 py-2 rounded-md text-sm font-medium">Kontak</a>
+                </div>
+                <!-- Mobile Menu Button (Hamburger) - PERBAIKAN AKSESIBILITAS --><button id="mobile-menu-btn" class="md:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none" aria-label="Buka menu navigasi" aria-expanded="false">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu Content --><div id="mobile-menu" class="hidden md:hidden bg-white shadow-xl">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <!-- Tautan Menu Seluler Diperbarui --><a href="#profile" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Profil</a>
+                <a href="#education" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Pendidikan</a>
+                <a href="#skills" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Keahlian</a>
+                <a href="#experience" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Pengalaman</a>
+                <a href="#certs" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Sertifikasi</a>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">Kontak</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. Hero Section (Home) --><!-- BAGIAN INI TELAH DIPERBAIKI SEPENUHNYA --><section id="home">
+        
+        <!-- Wadah Latar Belakang (Ombak & Burung) --><div class="relative overflow-hidden bg-white"> 
+
+            <!-- BARU: Latar Belakang Ombak SVG (z-5) - ATAS --><svg class="waves-top" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                <defs>
+                    <path id="gentle-wave-top" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                </defs>
+                <g class="parallax">
+                    <use xlink:href="#gentle-wave-top" x="48" y="0" />
+                    <use xlink:href="#gentle-wave-top" x="48" y="3" />
+                    <use xlink:href="#gentle-wave-top" x="48" y="5" />
+                    <use xlink:href="#gentle-wave-top" x="48" y="7" />
+                </g>
+            </svg>
+            <!-- AKHIR DARI SVG OMBAK ATAS -->
+
+            <!-- Latar Belakang Ombak SVG (z-5) - BAWAH (Sudah ada) -->
+            <!-- SVG .waves TELAH DIHAPUS -->
+
+            <!-- BARU: EKG Monitor Bar (Menggantikan Ombak Bawah) (z-5) -->
+            <div class="ekg-waves-container">
+                <!-- Teks Keterangan (z-10) -->
+                <div class="rhythm-display" id="rhythmName">LOADING DATA...</div>
+                <!-- SVG EKG (z-5) -->
+                <!-- PERUBAHAN: Menyesuaikan viewBox dan preserveAspectRatio untuk merentang penuh -->
+                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                     viewBox="0 0 500 200" style="enable-background:new 0 0 500 200;" xml:space="preserve" preserveAspectRatio="none">
+                    <g>
+                        <polyline class="ekg" id="ekgPolyline" points="" />
+                    </g>
+                </svg>
+            </div>
+            <!-- AKHIR DARI EKG MONITOR BAR -->
+            
+            <!-- HTML BURUNG BARU (REALISTIS) (z-10) --><div class="bird-container bird-container--one">
+                <div class="bird bird--one"></div>
+            </div>
+            <div class="bird-container bird-container--two">
+                <div class="bird bird--two"></div>
+            </div>
+            <div class="bird-container bird-container--three">
+                <div class="bird bird--three"></div>
+            </div>
+            <div class="bird-container bird-container--four">
+                <div class="bird bird--four"></div>
+            </div>
+            <!-- AKHIR DARI HTML BURUNG BARU -->
+
+            <!-- SIMBOL MENGAPUNG BARU (z-15) (Hanya Desktop) --><!-- Stetoskop (SVG BARU) --><svg id="float-stethoscope" class="floating-item" xml:space="preserve" viewBox="0 0 100 100" y="0" x="0" xmlns="http://www.w3.org/2000/svg" version="1.1" preserveAspectRatio="xMidYMid" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g>
+                    <path fill="currentColor" d="M60.1 55.8c-2.8 0-5.6-.6-8.2-1.7-2.5-1.1-4.8-2.6-6.7-4.5-1.9-1.9-3.5-4.2-4.5-6.7-1.1-2.6-1.7-5.4-1.7-8.2v-.2l1.6-18.6c.4-4.8 4.4-8.4 9.2-8.4H52v5.4h-2.1c-2 0-3.7 1.5-3.8 3.5l-1.6 18.5c0 2.1.4 4.1 1.2 6 .8 1.9 1.9 3.5 3.4 5 1.4 1.4 3.1 2.6 5 3.4 3.9 1.6 8.3 1.6 12.2 0 1.9-.8 3.5-1.9 5-3.4 1.4-1.4 2.6-3.1 3.4-5 .8-1.9 1.2-3.9 1.2-6l-1.6-18.5c-.2-2-1.8-3.5-3.8-3.5h-2.1V7.5h2.1c4.8 0 8.8 3.6 9.2 8.4l1.6 18.8c0 2.8-.6 5.6-1.7 8.2-1.1 2.5-2.6 4.8-4.5 6.7-1.9 1.9-4.2 3.5-6.7 4.5-2.7 1.2-5.5 1.7-8.3 1.7z"></path>
+                    <path fill="currentColor" d="M62.7 69.8V53.2h-5.4v20.3c0 7.5-6.1 13.6-13.6 13.6S30.1 81 30.1 73.5V69h-5.4v4.5c0 10.5 8.5 19 19 19 10.2 0 18.5-8 19-18.1V69.8z"></path>
+                    <circle fill="currentColor" r="8.4" cy="66.8" cx="27.2"></circle>
+                    <circle fill="currentColor" r="4.7" cy="66.8" cx="27.2"></circle>
+                </g>
+            </svg>
+            <!-- Simbol Plus (+) (SVG BARU) --><svg id="float-plus" class="floating-item" xml:space="preserve" viewBox="0 0 100 100" y="0" x="0" xmlns="http://www.w3.org/2000/svg" version="1.1" preserveAspectRatio="xMidYMid" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g>
+                    <circle fill="currentColor" r="40" cy="50" cx="50"></circle>
+                    <path d="M75 42.8H57.2V25H42.8v17.8H25v14.4h17.8V75h14.4V57.2H75z" fill="#fff"></path>
+                </g>
+            </svg>
+            <!-- Simbol Gembok (Perlindungan/Cybersecurity) (SVG LAMA) --><svg id="float-umbrella" class="floating-item" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM11 10V8C11 6.34315 12.3431 5 14 5C15.6569 5 17 6.34315 17 8V10H18C18.5523 10 19 10.4477 19 11V17C19 17.5523 18.5523 18 18 18H6C5.44772 18 5 17.5523 5 17V11C5 10.4477 5.44772 10 6 10H11ZM13 10V8C13 7.44772 13.4477 7 14 7C14.5523 7 15 7.44772 15 8V10H13Z"/>
+            </svg>
+            <!-- Simbol Suntik (SVG BARU) --><svg id="float-syringe" class="floating-item" xml:space="preserve" viewBox="0 0 100 100" y="0" x="0" xmlns="http://www.w3.org/2000/svg" version="1.1" preserveAspectRatio="xMidYMid" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g>
+                    <path fill="currentColor" d="M21.2 83.5l12.2-12.2-4.8-4.8-12.1 12.3-4.2-4.2c-1.3-1.3-3.5-1.3-4.8 0l17.9 17.9c1.3-1.3 1.3-3.5 0-4.8l-4.2-4.2z"></path>
+                    <path fill="currentColor" d="M68.6 39.2l-7.4-7.4c-1.6-1.6-4.2-1.6-5.7 0L44 43.2l13.1 13.1 11.4-11.4c1.7-1.6 1.7-4.1.1-5.7z"></path>
+                    <path d="M68.4 31.6L92.5 7.5" stroke-miterlimit="10" stroke-linecap="round" stroke-width="2" stroke="currentColor" fill="none"></path>
+                    <path fill="currentColor" d="M72.2 33L67 27.8c-.6-.6-1.5-.6-2 0l-2.8 2.8c-1.3-.7-2.7-1.1-4.1-1.1-2.1 0-4.3.8-5.9 2.4L26 58.2l-2-2.1c-1.1-1.1-2.8-1.1-3.9 0s-1.1 2.8 0 3.9L40 79.9c1.1 1.1 2.8 1.1 3.9 0s1.1-2.8 0-3.9l-2.1-2L68 47.8c2.7-2.7 3.2-6.8 1.4-10l2.8-2.8c.5-.6.5-1.5 0-2zm-6.5 12.5L39.5 71.7 28.3 60.5l3.2-3.2 3.6 3.6c.3.3.7.5 1.1.5s.8-.2 1.1-.5c.6-.6.6-1.7 0-2.3L33.8 55l1.9-1.9 3.6 3.6c.3.3.7.5 1.1.5s.8-.2 1.1-.5c.6-.6.6-1.7 0-2.3L38 50.8l1.9-1.9 3.6 3.6c.3.3.7.5 1.1.5s.8-.2 1.1-.5c.6-.6.6-1.7 0-2.3l-3.6-3.6 12.3-12.3c1-1 2.3-1.5 3.6-1.5s2.7.5 3.6 1.5l4 4c2.1 1.9 2.1 5.2.1 7.2z"></path>
+                </g>
+            </svg>
+            <!-- AKHIR DARI SIMBOL MENGAPUNG -->
+
+            <!-- Konten (Foto, Teks, Tombol) (z-20) --><!-- PERBAIKAN: Padding bawah ditambah (pb-48 -> pb-96) agar EKG tidak tumpang tindih --><div class="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-40 pb-96">
+                
+                <!-- KONTEN HERO SEKARANG DIBUNGKUS KARTU BARU --><!-- PERUBAHAN: Efek HANYA di sekitar foto --><div id="hero-card" class="hero-content-block">
+                    <!-- Div baru untuk cahaya (dikontrol JS) --><div class="circle-light"></div>
+                    
+                    <!-- Foto Profil --><div class="mb-0 mx-auto w-40 h-40 rounded-full overflow-hidden border-4 border-nurse-green shadow-lg transition duration-500 transform hover:scale-105 photo-pulse">
+                        <img src="android-chrome-192x192.png" 
+                             alt="Foto Profil Bernic Yesnat" 
+                             class="w-full h-full object-cover" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/160x160/93c47d/38761d?text=FOTO';" 
+                        />
+                    </div>
+                </div>
+                <!-- AKHIR DARI KARTU HERO BARU -->
+
+                <!-- PERUBAHAN: Teks dan Tombol DI LUAR kartu, dengan margin (mt-6) -->
+                <div class="mt-6">
+                    <!-- Teks Hero --><h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-2">BERNIC YESNAT</h1>
+                    <h2 class="text-2xl sm:text-3xl text-nurse-green font-semibold mb-4">Perawat Profesional & Inisiator Teknologi Kesehatan</h2>
+                    <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                        Lulusan baru yang berdedikasi dengan fondasi kuat dalam keterampilan klinis, komunikasi, dan <strong><mark class="karaoke-highlight">minat khusus dalam Keamanan Data Pasien dan Cybersecurity Kesehatan</mark>.</strong>
+                    </p>
+                    
+                    <!-- Tombol Hero --><div class="flex justify-center space-x-4">
+                        <a href="#experience" class="bg-nurse-green hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg transform hover:translate-y-[-2px]">
+                            <i data-lucide="stethoscope" class="icon w-5 h-5"></i>Lihat Pengalaman
+                        </a>
+                        <a href="#contact" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg transform hover:translate-y-[-2px]">
+                            <i data-lucide="mail" class="icon w-5 h-5"></i>Hubungi Saya
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- BARU: Simulator EKG Interaktif (Menggantikan Ombak Bawah) (z-5) -->
+            <div id="ekg-simulator-container">
+                <!-- Kontrol EKG -->
+                <header class="ekg-controls-header">
+                    <h2 class="hidden sm:block">Simulator EKG Interaktif</h2>
+                    <div class="ekg-controls">
+                        <!-- PERUBAHAN: Menghapus dropdown select ritme -->
+                        <!-- <label for="rhythm">Ritme:</label>
+                        <select id="rhythm">...</select> -->
+                        <label for="bpm" class="ml-2">BPM:</label>
+                        <input id="bpm" type="range" min="30" max="140" value="75" />
+                        <span id="bpmLabel">75 dpm</span>
+                        <button id="play" class="ml-2">Pause</button>
+                    </div>
+                </header>
+        
+                <!-- Kanvas SVG EKG -->
+                <div class="ekg-canvas-wrap">
+                    <!-- Menampilkan nama ritme di atas SVG -->
+                    <div id="rhythmNameDisplay" class="text-center font-bold text-nurse-green mb-2" style="font-size: 1.1rem; text-transform: uppercase;"></div>
+                    
+                    <svg id="ecg" viewBox="0 0 1200 200" preserveAspectRatio="xMidYMid slice" aria-label="Grafik EKG">
+                        <!-- background grid -->
+                        <defs>
+                            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <rect width="20" height="20" fill="transparent"></rect>
+                                <!-- Warna grid disesuaikan dengan var(--grid) -->
+                                <path d="M20 0 L0 0 0 20" fill="none" stroke="var(--grid)" stroke-width="0.7"/>
+                            </pattern>
+                        </defs>
+                        <rect x="0" y="0" width="1200" height="200" fill="url(#grid)"/>
+        
+                        <!-- baseline -->
+                        <line x1="0" y1="100" x2="1200" y2="100" stroke="rgba(56, 118, 29, 0.1)" stroke-width="1"/>
+        
+                        <!-- moving waveform group -->
+                        <g id="waveGroup" transform="translate(0,0)">
+                            <path id="wavePath" d="" fill="none" stroke="var(--line)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </g>
+        
+                        <!-- markers for P, QRS, T (hanya untuk NSR/Brady) -->
+                        <g id="markers" style="display:none">
+                            <line x1="100" y1="40" x2="100" y2="160" class="marker"></line>
+                            <text x="100" y="34" class="marker-text">P</text>
+        
+                            <line x1="186" y1="20" x2="186" y2="180" class="marker"></line>
+                            <text x="186" y="14" class="marker-text">QRS</text>
+        
+                            <line x1="316" y1="30" x2="316" y2="170" class="marker"></line>
+                            <text x="316" y="24" class="marker-text">T</text>
+        
+                            <line x1="251" y1="90" x2="251" y2="110" class="marker"></line>
+                            <text x="251" y="88" class="marker-text" font-size="11">ST</text>
+                        </g>
+                    </svg>
+                </div>
+        
+                <!-- Legenda (Opsional, disembunyikan di layar kecil) -->
+                <div class="ekg-labels hidden md:block">
+                    <div class="ekg-legend">
+                        <div class="ekg-chip">P: Depolarisasi atrium</div>
+                        <div class="ekg-chip">QRS: Depolarisasi ventrikel</div>
+                        <div class="ekg-chip">T: Repolarisasi ventrikel</div>
+                    </div>
+                </div>
+            </div>
+            <!-- AKHIR DARI SIMULATOR EKG BARU -->
+            
+        </div> 
+
+    </section> 
+
+    <!-- 2. Section: PROFIL (Personal Statement) - PERBAIKAN BAHASA DITERAPKAN --><section id="profile" class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 fade-in-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-6 border-b-2 pb-2 inline-block border-nurse-green">Profil & Pernyataan Diri</h2>
+            <div class="p-8 bg-white rounded-xl shadow-lg border-t-4 border-nurse-green card-hover transition duration-300">
+                <p class="text-lg text-gray-700 leading-relaxed">
+                    <!-- Teks diterjemahkan ke Bahasa Indonesia untuk konsistensi -->Lulusan baru yang berdedikasi dari program profesi ners dengan <mark>fondasi kuat dalam keterampilan klinis</mark>,
+                    termasuk asuhan keperawatan dasar, asesmen klinis komprehensif, kontrol infeksi, komunikasi, dan
+                    manajemen waktu. Cepat belajar dan mengintegrasikan teknologi layanan kesehatan baru, dengan <mark>minat yang kuat pada keamanan data pasien dan cybersecurity layanan kesehatan</mark>. <mark>Berkomitmen untuk memberikan layanan yang penuh kasih sayang</mark>,
+                    berpusat pada pasien sambil terus belajar dan tumbuh sebagai seorang perawat profesional.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Section: PENDIDIKAN (New Section) --><section id="education" class="py-12 px-4 sm:px-6 lg:px-8 fade-in-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-6 border-b-2 pb-2 inline-block border-nurse-green">Riwayat Pendidikan</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Program Profesi Ners --><div class="p-6 bg-white rounded-xl shadow-lg border-l-4 border-nurse-green card-hover transition duration-300">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2 flex items-center"><i data-lucide="graduation-cap" class="w-5 h-5 mr-2 text-nurse-green"></i>Program Profesi Ners</h3>
+                    <p class="text-lg font-medium text-gray-700">Universitas Klabat</p>
+                    <p class="text-gray-500">(2024 - 2025)</p>
+                </div>
+                <!-- Sarjana Keperawatan --><div class="p-6 bg-white rounded-xl shadow-lg border-l-4 border-nurse-green card-hover transition duration-300">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2 flex items-center"><i data-lucide="book-open" class="w-5 h-5 mr-2 text-nurse-green"></i>Sarjana Keperawatan</h3>
+                    <p class="text-lg font-medium text-gray-700">Universitas Klabat</p>
+                    <p class="text-gray-500">(2019 - 2023)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 4. Section: Keahlian & Kemampuan (SKILLS) --><section id="skills" class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 fade-in-section">
+        
+        <div class="relative z-10 max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-10 border-b-2 pb-2 inline-block border-nurse-green">Keahlian & Kemampuan Inti</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Skill 1: Basic Nursing Care --><div class="p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 card-hover">
+                    <i data-lucide="heart-handshake" class="w-8 h-8 text-nurse-green mb-3"></i>
+                    <h4 class="text-xl font-semibold mb-2">Perawatan Dasar Keperawatan</h4>
+                    <p class="text-gray-600">Memberikan perawatan berbasis bukti yang penuh kasih sayang dan berorientasi pada hasil.</p>
+                </div>
+                <!-- Skill 2: Clinical Assessment --><div class="p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 card-hover">
+                    <i data-lucide="clipboard-list" class="w-8 h-8 text-nurse-green mb-3"></i>
+                    <!-- PERBAIKAN: Memperbaiki kesalahan ketik "KomprehensIF" -->
+                    <h4 class="text-xl font-semibold mb-2">Asesmen Klinis Komprehensif</h4>
+                    <p class="text-gray-600">Evaluasi kondisi pasien secara menyeluruh untuk perencanaan perawatan yang efektif.</p>
+                </div>
+                <!-- Skill 3: Infection Control --><div class="p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 card-hover">
+                    <i data-lucide="shield-check" class="w-8 h-8 text-nurse-green mb-3"></i>
+                    <h4 class="text-xl font-semibold mb-2">Kontrol Infeksi</h4>
+                    <p class="text-gray-600">Memastikan lingkungan yang steril dan higienis untuk keamanan pasien dan staf.</p>
+                </div>
+                <!-- Skill 4: Communication --><div class="p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 card-hover">
+                    <i data-lucide="message-square" class="w-8 h-8 text-nurse-green mb-3"></i>
+                    <h4 class="text-xl font-semibold mb-2">Komunikasi Empatik</h4>
+                    <p class="text-gray-600">Membangun kepercayaan dengan pasien dan keluarga untuk memastikan pemahaman rencana perawatan.</p>
+                </div>
+                <!-- Skill 5: Time Management --><div class="p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 card-hover">
+                    <i data-lucide="clock" class="w-8 h-8 text-nurse-green mb-3"></i>
+                    <h4 class="text-xl font-semibold mb-2">Manajemen Waktu Efektif</h4>
+                    <p class="text-gray-600">Prioritisasi tugas yang efektif dalam pengaturan klinis yang serba cepat.</p>
+                </div>
+                <!-- Skill 6: Tech & Cybersecurity --><div class="p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 card-hover">
+                    <i data-lucide="lock" class="w-8 h-8 text-nurse-green mb-3"></i>
+                    <h4 class="text-xl font-semibold mb-2">Keamanan Data Pasien & Teknologi</h4>
+                    <p class="text-gray-600">Memahami dan menerapkan praktik etis dan aman dalam penggunaan alat digital kesehatan.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 5. Section: Pengalaman (EXPERIENCE) --><section id="experience" class="py-16 px-4 sm:px-6 lg:px-8 fade-in-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12 border-b-2 pb-2 inline-block border-nurse-green">Pengalaman Kerja & Proyek</h2>
+            
+            <!-- Pengalaman Klinis --><div class="space-y-12">
+                <div class="flex flex-col md:flex-row bg-white p-8 rounded-xl shadow-lg card-hover transition duration-300">
+                    <div class="md:w-1/4 mb-4 md:mb-0 flex-shrink-0">
+                        <!-- PERBAIKAN KONTRAK: Teks diubah menjadi hijau tua agar mudah dibaca --><span class="text-sm font-semibold text-nurse-green bg-nurse-light py-1 px-3 rounded-full inline-block">1 Tahun</span>
+                        <p class="mt-2 text-lg font-medium text-gray-600">2024 - 2025</p>
+                    </div>
+                    <div class="md:w-3/4 md:pl-8 border-l-4 border-nurse-green pl-4">
+                        <h3 class="text-2xl font-bold text-gray-900">Professional Nursing Program Trainee</h3>
+                        <h4 class="text-xl text-nurse-green font-semibold mb-4">RSUP Prof. Dr. R. D. Kandou Manado (National Hospital)</h4>
+                        <ul class="list-disc list-inside text-gray-700 space-y-2">
+                            <li><strong><mark>Komunikasi Empatik</mark>:</strong> Berpengalaman dalam memberikan komunikasi yang jelas dan empatik kepada pasien dan keluarga.</li>
+                            <li><strong><mark>Asuhan Langsung</mark>:</strong> Mengadministrasikan obat, memberikan perawatan esensial, dan memantau respons pasien.</li>
+                            <li><strong><mark>Perencanaan Perawatan</mark>:</strong> Berpengalaman dalam mengases, merencanakan, dan mengevaluasi rencana asuhan keperawatan.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row bg-white p-8 rounded-xl shadow-lg card-hover transition duration-300">
+                    <div class="md:w-1/4 mb-4 md:mb-0 flex-shrink-0">
+                        <span class="text-sm font-semibold text-nurse-green bg-nurse-light py-1 px-3 rounded-full inline-block">Trainee</span>
+                    </div>
+                    <div class="md:w-3/4 md:pl-8 border-l-4 border-nurse-green pl-4">
+                        <h3 class="text-2xl font-bold text-gray-900">Trainee Keperawatan Jiwa</h3>
+                        <h4 class="text-xl text-nurse-green font-semibold mb-4">RSJ Prof. Dr. V. L. Ratumbuysang</h4>
+                        <ul class="list-disc list-inside text-gray-700 space-y-2">
+                            <li><strong><mark>Dukungan Mental</mark>:</strong> Mendukung pasien dengan depresi, isolasi sosial, dan halusinasi melalui perawatan terapeutik dan emosional.</li>
+                            <li><strong>Pencatatan Perilaku:</strong> Mengobservasi dan mencatat status mental, perubahan perilaku, dan kemajuan pasien untuk mendukung rencana perawatan.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Proyek Khusus --><div class="bg-nurse-green text-white p-8 rounded-xl shadow-xl transition duration-300 transform hover:scale-[1.01]">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center"><i data-lucide="lightbulb" class="w-6 h-6 mr-3"></i>Proyek Pengembangan Profesional</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong><mark>Proyek AI Keperawatan (Dalam Proses)</mark>:</strong> Pengembangan Sistem Kecerdasan Buatan untuk Analisis Diagnosis, Luaran, dan Intervensi Keperawatan (SDKI, SLKI, SIKI) guna mendukung Pengambilan Keputusan Klinis.</li>
+                        <li><strong><mark>Keamanan Data</mark>:</strong> Berperan aktif dalam mendukung keamanan data pasien di lingkungan rumah sakit.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Section: Sertifikasi & Pelatihan (CERTS) --><section id="certs" class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 fade-in-section">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-12 border-b-2 pb-2 inline-block border-nurse-green">Sertifikasi & Pelatihan</h2>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Data Sertifikasi yang Sekarang MENUNJUK KE https://certificate.bernicyesnat.icu/ --><a href="https://certificate.bernicyesnat.icu/" target="_blank" class="block">
+                    <div class="p-4 bg-nurse-green text-white rounded-lg shadow-md text-center transform hover:scale-105 hover:bg-green-700 transition duration-300 card-hover h-full flex flex-col justify-between">
+                        <div>
+                            <i data-lucide="award" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="font-bold">BTCLS</p>
+                            <p class="text-xs">Basic Trauma Cardiac Life Support</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-3 h-3 mx-auto mt-2 opacity-75"></i>
+                    </div>
+                </a>
+                
+                <a href="https://certificate.bernicyesnat.icu/" target="_blank" class="block">
+                    <div class="p-4 bg-nurse-green text-white rounded-lg shadow-md text-center transform hover:scale-105 hover:bg-green-700 transition duration-300 card-hover h-full flex flex-col justify-between">
+                        <div>
+                            <i data-lucide="award" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="font-bold">TBI</p>
+                            <p class="text-xs">Traumatic Brain Injury</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-3 h-3 mx-auto mt-2 opacity-75"></i>
+                    </div>
+                </a>
+                
+                <a href="https://certificate.bernicyesnat.icu/" target="_blank" class="block">
+                    <div class="p-4 bg-nurse-green text-white rounded-lg shadow-md text-center transform hover:scale-105 hover:bg-green-700 transition duration-300 card-hover h-full flex flex-col justify-between">
+                        <div>
+                            <i data-lucide="award" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="font-bold">CEH</p>
+                            <p class="text-xs">Certified Ethical Hacker (Minat Cybersecurity)</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-3 h-3 mx-auto mt-2 opacity-75"></i>
+                    </div>
+                </a>
+                
+                <a href="https://certificate.bernicyesnat.icu/" target="_blank" class="block">
+                    <div class="p-4 bg-nurse-green text-white rounded-lg shadow-md text-center transform hover:scale-105 hover:bg-green-700 transition duration-300 card-hover h-full flex flex-col justify-between">
+                        <div>
+                            <i data-lucide="award" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="font-bold">HIPERKES</p>
+                            <p class="text-xs">Higiene Perusahaan dan Kesehatan Kerja</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-3 h-3 mx-auto mt-2 opacity-75"></i>
+                    </div>
+                </a>
+                
+                <a href="https://certificate.bernicyesnat.icu/" target="_blank" class="block">
+                    <div class="p-4 bg-nurse-green text-white rounded-lg shadow-md text-center transform hover:scale-105 hover:bg-green-700 transition duration-300 card-hover h-full flex flex-col justify-between">
+                        <div>
+                            <i data-lucide="award" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="font-bold">LIVING WITH FIRE</p>
+                            <p class="text-xs">Penanganan Kebakaran</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-3 h-3 mx-auto mt-2 opacity-75"></i>
+                    </div>
+                </a>
+                
+                <a href="https://certificate.bernicyesnat.icu/" target="_blank" class="block">
+                    <div class="p-4 bg-nurse-green text-white rounded-lg shadow-md text-center transform hover:scale-105 hover:bg-green-700 transition duration-300 card-hover h-full flex flex-col justify-between">
+                        <div>
+                            <i data-lucide="award" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="font-bold">7 DAY LIVETYLE TRAINNING</p>
+                            <p class="text-xs">Mental Health During Pandemic</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-3 h-3 mx-auto mt-2 opacity-75"></i>
+                    </div>
+                </a>
+                
+                <a href="https://certificate.bernicyesnat.icu/" target="_blank" class="block">
+                    <div class="p-4 bg-nurse-green text-white rounded-lg shadow-md text-center transform hover:scale-105 hover:bg-green-700 transition duration-300 card-hover h-full flex flex-col justify-between">
+                        <div>
+                            <i data-lucide="award" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="font-bold">PERAN PERAWAT SEBAGAI EDUKATOR</p>
+                            <p class="text-xs">Di Masa Pandemi COVID-19</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-3 h-3 mx-auto mt-2 opacity-75"></i>
+                    </div>
+                </a>
+                
+                <a href="https://certificate.bernicyesnat.icu/" target="_blank" class="block">
+                    <div class="p-4 bg-nurse-green text-white rounded-lg shadow-md text-center transform hover:scale-105 hover:bg-green-700 transition duration-300 card-hover h-full flex flex-col justify-between">
+                        <div>
+                            <i data-lucide="award" class="w-8 h-8 mx-auto mb-2"></i>
+                            <p class="font-bold">PEDIATRIC NURSE</p>
+                            <p class="text-xs">Caring Hands, Compassionate Hearts</p>
+                        </div>
+                        <i data-lucide="external-link" class="w-3 h-3 mx-auto mt-2 opacity-75"></i>
+                    </div>
+                </a>
+                
+            </div>
+            
+            <p class="text-center mt-8 text-sm text-gray-500 italic">
+                Semua tautan sertifikat dialihkan ke <a href="https://certificate.bernicyesnat.icu/" target="_blank" class="text-blue-600 hover:underline">https://certificate.bernicyesnat.icu/</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- 7. Section: Kontak Penuh (CONTACT) --><section id="contact" class="py-16 px-4 sm:px-6 lg:px-8 bg-white fade-in-section">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-10 border-b-2 pb-2 inline-block border-nurse-green">Hubungi Saya & Lokasi</h2>
+            <p class="text-center text-gray-600 mb-8">Anda dapat menghubungi saya secara langsung melalui kontak di bawah ini. Saya akan merespon secepat mungkin.</p>
+            
+            <!-- Kontak Langsung (Buttons) --><div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <!-- Tombol WhatsApp --><a href="https://wa.me/6285823003035" target="_blank" class="flex items-center justify-center p-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
+                    <i data-lucide="message-square" class="w-6 h-6 mr-2"></i>
+                    <span>WhatsApp</span>
+                </a>
+
+                <!-- Tombol Telepon (Nomor HP) --><a href="tel:+6285823003035" class="flex items-center justify-center p-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
+                    <i data-lucide="phone" class="w-6 h-6 mr-2"></i>
+                    <span>Hubungi HP</span>
+                </a>
+                
+                <!-- Tombol Email --><a href="mailto:bernicyesnat0106@gmail.com" class="flex items-center justify-center p-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
+                    <i data-lucide="mail" class="w-6 h-6 mr-2"></i>
+                    <span>Kirim Email</span>
+                </a>
+            </div>
+            
+            <!-- KARTU PROFIL LINKEDIN BARU & DIPERBARUI --><div class="my-12 p-6 bg-white rounded-xl shadow-lg border-l-4 border-blue-700 card-hover transition duration-300 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+                <!-- Foto --><div class="flex-shrink-0">
+                    <img class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-gray-300"
+                         src="android-chrome-192x192.png" 
+                         alt="Foto Profil Bernic Yesnat" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/96x96/0A66C2/ffffff?text=BY';">
+                </div>
+                
+                <!-- Info --><div class="flex-grow text-center sm:text-left">
+                    <div class="flex items-center justify-center sm:justify-start mb-1">
+                        <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                            Yesnat Bernic 
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/LinkedIn_icon.svg/2048px-LinkedIn_icon.svg.png" 
+                                 alt="LinkedIn Logo" class="w-5 h-5 ml-2 mr-1">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-blue-500 fill-blue-500"></i>
+                        </h3>
+                    </div>
+                    
+                    <p class="text-sm font-semibold text-gray-700 leading-tight">Registered Nurse (RN) | Cybersecurity Enthusiast</p>
+                    <p class="text-sm text-gray-600 leading-tight">Bridging Healthcare and Technology | Passionate about Patient Safety & Digital Security</p>
+                    <p class="text-sm text-gray-500 mt-2 flex items-center justify-center sm:justify-start">
+                        <i data-lucide="university" class="w-4 h-4 mr-1 text-gray-500"></i> Universitas Klabat
+                    </p>
+                    <p class="text-sm text-gray-500 flex items-center justify-center sm:justify-start">
+                        <i data-lucide="map-pin" class="w-4 h-4 mr-1 text-gray-500"></i> Manado, North Sulawesi, Indonesia
+                    </p>
+                </div>
+                
+                <!-- Tombol Aksi (Tautan LinkedIn bersih tanpa tracker) --><div class="flex-shrink-0 w-full sm:w-auto mt-4 sm:mt-0">
+                    <a href="https://www.linkedin.com/in/yesnat-bernic-332b562b3/" target="_blank" 
+                       class="bg-linkedin hover:bg-linkedin-dark text-white font-bold py-3 px-5 rounded-lg transition duration-300 shadow-lg flex items-center justify-center w-full sm:w-auto">
+                        <i data-lucide="external-link" class="w-5 h-5 mr-2"></i>
+                        Kunjungi Profil
+                    </a>
+                </div>
+            </div>
+            <!-- AKHIR DARI KARTU LINKEDIN --><!-- Informasi Kontak & Lokasi DPINDAHKAN KE SINI --><div class="grid md:grid-cols-2 gap-6 text-left">
+                <!-- Informasi Kontak --><div class="p-6 bg-gray-100 rounded-xl shadow-inner border-l-4 border-nurse-green card-hover transition duration-300">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2 flex items-center"><i data-lucide="at-sign" class="w-5 h-5 mr-2 text-nurse-green"></i>Informasi Kontak</h3>
+                    <p class="mb-1"><span class="font-medium">Telepon:</span> +62 858-2300-3035</p>
+                    <p class="mb-1"><span class="font-medium">Email:</span> bernicyesnat0106@gmail.com</p>
+                    <p class="mb-1"><span class="font-medium">Website:</span> <a href="http://www.bernicyesnat.icu" target="_blank" class="text-blue-600 hover:underline">www.bernicyesnat.icu</a></p>
+                </div>
+                
+                <!-- Lokasi --><div class="p-6 bg-gray-100 rounded-xl shadow-inner border-l-4 border-nurse-green card-hover transition duration-300">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2 flex items-center"><i data-lucide="map-pin" class="w-5 h-5 mr-2 text-nurse-green"></i>Lokasi</h3>
+                    <address class="text-gray-600 not-italic">
+                        Jaga II, Sawangan Village, <br>
+                        Airmadidi District, North Minahasa Regency, <br>
+                        North Sulawesi, Indonesia 95371
+                    </address>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer --><footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm">&copy; <span id="current-year"></span> Bernic Yesnat. Portofolio Perawat Profesional.</p>
+            <p class="text-xs mt-2 text-gray-400">Dibuat dengan dedikasi di North Sulawesi, Indonesia.</p>
+        </div>
+    </footer>
+
+    <!-- BARU: Tombol Aksi Mengambang (FAB) -->
+    <div class="floating-action-buttons">
+        <!-- PERUBAHAN: Mengganti ikon Lucide dengan SVG WhatsApp -->
+        <a href="https://wa.me/6285823003035" target="_blank" class="fab-button bg-green-500 hover:bg-green-600" title="Hubungi via WhatsApp">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.451-4.437-9.885-9.888-9.885-5.451 0-9.885 4.434-9.888 9.884-.001 2.225.651 4.315 1.847 6.03l-1.213 4.407 4.545-1.189zM18.332 14.944c-.282-.142-1.664-.823-1.922-.916-.259-.093-.448-.142-.637.142-.189.282-.726.916-.891 1.103-.164.188-.328.213-.612.07-.282-.142-1.191-.441-2.268-1.397-.838-.744-1.404-1.662-1.57-1.944-.164-.282-.018-.432.124-.573.13-.13.282-.328.423-.489.142-.164.188-.282.282-.47.093-.188.047-.352-.023-.493-.07-.142-.637-1.53-.872-2.102-.234-.573-.47-.493-.637-.504-.164-.012-.352-.012-.541-.012-.189 0-.493.07-.749.352-.257.282-.986.96-1.213 2.308-.227 1.348.234 2.688.282 2.873.047.188 1.004 1.53 2.422 2.723.37.308.66.493.921.628.417.213.79.352 1.08.447.359.117.674.101.905-.047.258-.164 1.03-1.178 1.314-1.603.282-.424.282-.785.188-.916z"/>
+            </svg>
+        </a>
+        <!-- Tombol Buka CV -->
+        <button id="open-cv-modal" class="fab-button bg-nurse-green hover:bg-green-700" title="Lihat & Download CV">
+            <i data-lucide="file-text" class="w-6 h-6"></i>
+        </button>
+    </div>
+
+    <!-- BARU: Modal CV (Awalnya Tersembunyi) -->
+    <div id="cv-modal-overlay" class="modal-overlay hidden">
+        <!-- Konten Modal -->
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden">
+            <!-- Header Modal -->
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">Curriculum Vitae - Bernic Yesnat</h3>
+                <div class="flex space-x-2">
+                    <!-- Tombol Download di dalam Modal (PERUBAHAN: Tipe diubah menjadi 'button' dan diberi ID) -->
+                    <button id="download-cv-btn" class="bg-nurse-green hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-lg text-sm flex items-center">
+                        <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                        Download PDF
+                    </button>
+                    <!-- Tombol Tutup -->
+                    <button id="close-cv-modal" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Body Modal (Embed PDF) -->
+            <div class="flex-grow bg-gray-200">
+                <!-- PERUBAHAN: Menambahkan konten fallback di dalam iframe jika embed gagal -->
+                <iframe id="cv-pdf-embed" src="about:blank" class="w-full h-full border-0" title="CV Bernic Yesnat">
+                    <div class="p-8 text-center text-gray-700">
+                        <p class="font-semibold text-lg">Gagal memuat pratinjau PDF.</p>
+                        <p>Ini mungkin karena pengaturan keamanan browser Anda (Mixed Content) atau server hosting PDF.</p>
+                        <p class="mt-4">Silakan gunakan tombol <strong>Download PDF</strong> di atas untuk melihat atau menyimpan CV.</p>
+                    </div>
+                </iframe>
+            </div>
+        </div>
+    </div>
+    <!-- AKHIR DARI MODAL CV -->
+
+    
+    <script>
+        // PERBAIKAN: Membungkus semua JS dalam DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // INISIALISASI LUCIDE ICONS
+            lucide.createIcons();
+
+            // --- LOGIKA EKG BARU (DARI EKG-Visualisasi.html) ---
+            const svgNS = 'http://www.w3.org/2000/svg'
+            const wavePath = document.getElementById('wavePath')
+            const waveGroup = document.getElementById('waveGroup')
+            const markers = document.getElementById('markers')
+            
+            // PERUBAHAN: Hapus rhythmSelect (karena dropdown dihapus dari HTML)
+            const rhythmNameDisplay = document.getElementById('rhythmNameDisplay'); // Elemen baru untuk nama ritme
+            const bpmRange = document.getElementById('bpm')
+            const bpmLabel = document.getElementById('bpmLabel')
+            const playBtn = document.getElementById('play')
+
+            if (bpmRange) {
+                bpmRange.addEventListener('input', ()=>{
+                    bpmLabel.textContent = bpmRange.value + ' dpm'
+                    // Jika manual ubah BPM, kita rebuild dengan ritme saat ini
+                    rebuild()
+                })
+            }
+
+            let playing = true
+            if (playBtn) {
+                playBtn.addEventListener('click', ()=>{ 
+                    playing = !playing; 
+                    playBtn.textContent = playing ? 'Pause' : 'Play'; 
+                    if(playing) animate(); 
+                })
+            }
+
+            // Animasi utama: mentranslasikan waveGroup
+            let animId = null
+            let offset = 0
+            function animate(){
+                if(!playing || !waveGroup || !bpmRange) return // Menambahkan pemeriksaan null
+                const bpm = Number(bpmRange.value)
+                // Kecepatan kira-kira sebanding dengan BPM
+                const speed = bpm/60 * 1.8 // tweak
+                offset = (offset - speed) % 1200
+                waveGroup.setAttribute('transform', `translate(${offset},0)`)
+                animId = requestAnimationFrame(animate)
+            }
+
+            // --- FUNGSI PATH EKG REALISTIS ---
+            function nsrPath(bpm){
+                const width = 1200; let x = 0; let path = '';
+                const cyclePx = (60 / bpm) * 200; 
+                
+                while(x < width + 200){
+                    path += `M ${x} 100 `; 
+                    // Gelombang P: halus naik turun
+                    path += `c 5 -10 15 -10 20 0 `; x += 20;
+                    // PR Segment
+                    path += `h 10 `; x += 10;
+                    // QRS Kompleks: tajam dan tinggi
+                    path += `l 2 5 l 6 -70 l 6 80 l 2 -15 `; x += 16;
+                    // ST Segment
+                    path += `h 10 `; x += 10;
+                    // Gelombang T: lebih lebar dari P
+                    path += `c 10 -30 30 -30 40 0 `; x += 40;
+
+                    // Jarak sisa untuk siklus
+                    const cycleUsed = 20 + 10 + 16 + 10 + 40;
+                    const remainingSpace = cyclePx - cycleUsed;
+                    if(remainingSpace > 0) { path += `h ${remainingSpace} `; x += remainingSpace; } 
+                    else { path += `h 10 `; x += 10; }
+                }
+                return path
+            }
+            function bradyPath(bpm){ return nsrPath(bpm); }
+            function tachyPath(bpm){ return nsrPath(bpm); }
+            function sinusArrhythmiaPath(bpm) {
+                const width = 1200; let x = 0; let path = '';
+                const baseCyclePx = (60 / bpm) * 200;
+                while(x < width + 200){
+                    const cycleVariation = (Math.random() - 0.5) * 80; 
+                    const cyclePx = Math.max(100, baseCyclePx + cycleVariation);
+                    
+                    path += `M ${x} 100 `; 
+                    path += `c 5 -10 15 -10 20 0 `; x += 20;
+                    path += `h 10 `; x += 10;
+                    path += `l 2 5 l 6 -70 l 6 80 l 2 -15 `; x += 16;
+                    path += `h 10 `; x += 10;
+                    path += `c 10 -30 30 -30 40 0 `; x += 40;
+
+                    const cycleUsed = 20 + 10 + 16 + 10 + 40;
+                    const remainingSpace = cyclePx - cycleUsed;
+                    if(remainingSpace > 0) { path += `h ${remainingSpace} `; x += remainingSpace; } else { path += `h 10 `; x += 10; }
+                }
+                return path;
+            }
+            function afibPath(bpm){
+                const width = 1200; let x=0; let path='';
+                const baseCyclePx = (60 / bpm) * 200;
+                while(x < width+200){
+                    let fibrillateX = x;
+                    const rrInterval = (baseCyclePx * (0.7 + Math.random() * 0.6)); 
+                    const qrsDur = 16; const stSegment = 10; const tDur = 30; 
+                    const cycleUsed = qrsDur + stSegment + tDur;
+                    const fibLength = Math.max(0, rrInterval - cycleUsed);
+                    let currentFib = 0;
+                    while (currentFib < fibLength) {
+                         const w = 10 + Math.random()*10; const h = -3 + Math.random()*6;
+                         path += `q ${w/2} ${h} ${w} 0 `; currentFib += w; x += w;
+                    }
+                    path += `l 2 5 l 6 -70 l 6 80 l 2 -15 `; x += qrsDur;
+                    path += `h 10 `; x += stSegment;
+                    path += `q ${tDur/2} -20 ${tDur} 0 `; x += tDur;
+                }
+                return path
+            }
+            function flutterPath(bpm){
+                const width = 1200; let x=0; let path='';
+                const flutterWaveDur = 40; const qrsDur = 16;
+                while(x < width+200){
+                    for(let i=0; i<3; i++){ path += `M ${x} 100 L ${x+15} 85 L ${x+40} 100 `; x += flutterWaveDur; }
+                    path += `l 2 5 l 6 -70 l 6 80 l 2 -15 `; x += qrsDur;
+                    path += `h 20 `; x += 20;
+                }
+                return path
+            }
+            function vtPath(bpm){
+                const width = 1200; let x=0; let path='';
+                const cycleWidth = (60 / bpm) * 200; 
+                while(x < width+200){
+                    // Wide monomorphic waves
+                    path += `M ${x} 100 q 15 -80 30 0 q 15 20 30 0 `; 
+                    x += cycleWidth;
+                }
+                return path;
+            }
+            function vfibPath(bpm){
+                const width=1200; let x=0; let path='';
+                while(x < width+200){
+                    const h = 20 + Math.random()*60; const w = 15 + Math.random()*25; 
+                    path += `M ${x} ${100 + Math.random()*20 -10} q ${w/2} ${-h} ${w} ${h/3} `
+                    x += w;
+                }
+                return path
+            }
+            function heartBlockPath(bpm){
+                const width=1200; let x=0; let path='';
+                const pDur = 20; const prSegment = 20; 
+                while(x < width+200){
+                    path += `M ${x} 100 c 5 -10 15 -10 20 0 `; x += pDur;
+                    if(Math.random() > 0.3){ 
+                        path += `h ${prSegment} `; x += prSegment;
+                        const qrsDur = 16;
+                        path += `l 2 5 l 6 -70 l 6 80 l 2 -15 `; x += qrsDur;
+                        const stSegment = 10; const tDur = 40;
+                        path += `h ${stSegment} `; x += stSegment;
+                        path += `c 10 -30 30 -30 40 0 `; x += tDur;
+                        path += `h 60 `; x += 60;
+                    } else {
+                        path += `h 120 `; x += 120;
+                    }
+                }
+                return path
+            }
+            // --- AKHIR FUNGSI PATH ---
+
+            // --- LOGIKA OTOMATIS BERGANTI ---
+            const rhythmKeys = [
+                { code: 'nsr', name: 'Normal Sinus Rhythm (NSR)' },
+                { code: 'brady', name: 'Sinus Bradikardia' },
+                { code: 'tachy', name: 'Sinus Takikardia' },
+                { code: 'sinus_ar', name: 'Sinus Aritmia' },
+                { code: 'afib', name: 'Fibrilasi Atrium (AFib)' },
+                { code: 'flutter', name: 'Flutter Atrium' },
+                { code: 'vt', name: 'Takikardia Ventrikel (VT)' },
+                { code: 'vfib', name: 'Fibrilasi Ventrikel (VFib)' },
+                { code: 'hb', name: 'Blok Jantung (Heart Block)' }
+            ];
+            let currentRhythmIndex = 0;
+
+            function rebuild(){
+                if (!wavePath || !bpmRange) return; 
+                cancelAnimationFrame(animId);
+                
+                // Ambil ritme saat ini dari array berdasarkan index otomatis
+                const currentRhythm = rhythmKeys[currentRhythmIndex];
+                const rhythm = currentRhythm.code;
+                
+                // Update tampilan nama ritme
+                if (rhythmNameDisplay) rhythmNameDisplay.textContent = currentRhythm.name;
+                
+                const bpm = Number(bpmRange.value);
+                let p = '';
+                
+                if (markers) markers.style.display = 'none';
+
+                switch(rhythm){
+                    case 'nsr': p = nsrPath(bpm); if (markers) markers.style.display = 'block'; break;
+                    case 'brady': p = bradyPath(bpm); if (markers) markers.style.display = 'block'; break;
+                    case 'tachy': p = tachyPath(bpm); break;
+                    case 'sinus_ar': p = sinusArrhythmiaPath(bpm); break; 
+                    case 'afib': p = afibPath(bpm); break;
+                    case 'flutter': p = flutterPath(bpm); break;
+                    case 'vt': p = vtPath(bpm); break;
+                    case 'vfib': p = vfibPath(bpm); break;
+                    case 'hb': p = heartBlockPath(bpm); break;
+                    default: p = nsrPath(bpm);
+                }
+                wavePath.setAttribute('d', p);
+                offset = 0;
+                if (waveGroup) waveGroup.setAttribute('transform', `translate(${offset},0)`);
+                playing = true; 
+                if (playBtn) playBtn.textContent = 'Pause';
+                animate();
+            }
+
+            // Pembangunan awal
+            rebuild();
+            
+            // Interval otomatis ganti ritme setiap 4 detik
+            setInterval(() => {
+                currentRhythmIndex = (currentRhythmIndex + 1) % rhythmKeys.length;
+                rebuild();
+            }, 4000);
+
+            // Pastikan animasi dijeda saat halaman tidak terlihat
+            document.addEventListener('visibilitychange', ()=>{
+                if(document.hidden){ 
+                    playing=false; 
+                    if (playBtn) playBtn.textContent='Play'; 
+                } else { 
+                    playing=true; 
+                    if (playBtn) playBtn.textContent='Pause'; 
+                    animate(); 
+                } 
+            });
+
+            // Klik pada SVG untuk toggle play/pause
+            const ecgSvg = document.getElementById('ecg');
+            if (ecgSvg) {
+                ecgSvg.addEventListener('click', ()=>{ 
+                    playing = !playing; 
+                    if (playBtn) playBtn.textContent = playing ? 'Pause' : 'Play'; 
+                    if(playing) animate(); 
+                });
+            }
+            // --- AKHIR LOGIKA EKG BARU ---
+
+
+            // --- LOGIKA LOADING SCREEN LAMA (DIHAPUS) ---
+            // --- PERUBAHAN: Logika Jeda 4 Detik (DIHAPUS) ---
+
+            // LOGIKA BARU: Tunda Inisialisasi Highlight hingga 100% Load + Scroll Pertama
+            let hasScrolledAfterLoad = false; // Penanda untuk highlight
+
+            window.onload = function() {
+                // LOGIKA BARU: Tambahkan pendengar 'scroll' HANYA SETELAH load selesai
+                // Ini akan mengaktifkan highlight saat pengguna scroll sedikit
+                window.addEventListener('scroll', function onFirstScroll() {
+                    // Hanya jalankan sekali
+                    if (!hasScrolledAfterLoad) {
+                        hasScrolledAfterLoad = true;
+                        
+                        // Aktifkan Intersection Observer untuk highlight
+                        initializeHighlightObserver();
+                        
+                        // Hapus pendengar scroll ini agar tidak berjalan lagi
+                        window.removeEventListener('scroll', onFirstScroll);
+                    }
+                }, { passive: true }); // Opsi performa
+            };
+            // --- AKHIR DARI LOGIKA LOADING SCREEN ---
+
+
+            // LOGIKA MOBILE MENU
+            // PERBAIKAN: Definisi variabel dipindahkan ke sini agar tidak error
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navLinks = document.querySelectorAll('#mobile-menu a');
+            const desktopNavLinks = document.querySelectorAll('nav .hidden.md\\:flex a'); 
+
+            if (mobileMenuBtn && mobileMenu) { 
+                mobileMenuBtn.addEventListener('click', () => {
+                    const isExpanded = mobileMenu.classList.toggle('hidden');
+                    mobileMenuBtn.setAttribute('aria-expanded', !isExpanded);
+                });
+            }
+
+
+            // MENGATUR TAHUN DI FOOTER
+            const currentYearEl = document.getElementById('current-year');
+            if (currentYearEl) {
+                currentYearEl.textContent = new Date().getFullYear();
+            }
+
+            // LOGIKA TRANSISI FADE-IN SAAT SCROLL (Intersection Observer)
+            // DIPERBARUI: DIBUNGKUS DALAM FUNGSI AGAR BISA DITUNDA
+            function initializeHighlightObserver() {
+                const sections = document.querySelectorAll('.fade-in-section');
+
+                if (sections.length > 0) { 
+                    const observerOptions = {
+                        root: null, 
+                        rootMargin: '0px',
+                        threshold: 0.1 
+                    };
+
+                    const observer = new IntersectionObserver((entries, observer) => {
+                        entries.forEach(entry => {
+                            const marksToHighlight = entry.target.querySelectorAll('mark:not(.karaoke-highlight)');
+                            const existingTimer = entry.target.dataset.highlightTimer;
+                            if (existingTimer) {
+                                clearTimeout(parseInt(existingTimer)); 
+                            }
+
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('is-visible');
+
+                                if (marksToHighlight.length > 0) {
+                                    const sectionId = entry.target.id;
+                                    let delay = 2000; // Default 2 detik
+
+                                    if (sectionId === 'profile') {
+                                        delay = 5000; // Khusus 5 detik untuk Profil
+                                    }
+
+                                    const timerId = setTimeout(() => {
+                                        marksToHighlight.forEach(mark => {
+                                            mark.classList.add('highlight-reveal');
+                                        });
+                                    }, delay);
+                                    
+                                    entry.target.dataset.highlightTimer = timerId;
+                                }
+                            } else {
+                                entry.target.classList.remove('is-visible');
+                                if (marksToHighlight.length > 0) {
+                                    marksToHighlight.forEach(mark => {
+                                        mark.classList.remove('highlight-reveal');
+                                    });
+                                }
+                            }
+                        });
+                    }, observerOptions);
+
+                    sections.forEach(section => {
+                        observer.observe(section);
+                    });
+                }
+            }
+            // CATATAN: initializeHighlightObserver() SEKARANG DIPANGGIL OLEH window.onload -> onFirstScroll
+
+
+            // FUNGSI UNTUK SCROLL AKURAT SETELAH KLIK NAVIGASI
+            function handleNavClick(event) {
+                event.preventDefault(); 
+                const targetId = event.currentTarget.getAttribute('href');
+                if (!targetId) return;
+                
+                const navbarHeight = document.getElementById('main-navbar') ? document.getElementById('main-navbar').offsetHeight : 0;
+
+                if (targetId === '#home') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                    }
+                    return;
+                }
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const targetPosition = targetElement.offsetTop - navbarHeight - 10; 
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+                
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                    if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                }
+            }
+            
+            // Pasang event listener ke semua tautan navigasi
+            if (navLinks.length > 0) {
+                navLinks.forEach(link => {
+                    link.addEventListener('click', handleNavClick);
+                });
+            }
+            if (desktopNavLinks.length > 0) {
+                desktopNavLinks.forEach(link => {
+                    link.addEventListener('click', handleNavClick);
+                });
+            }
+            
+            // LOGIKA BARU: MENGGANTI WARNA LATAR BELAKANG SETIAP 2 MENIT
+            setInterval(() => {
+                document.body.classList.toggle('warm-bg');
+            }, 120000); 
+
+            // LOGIKA BARU: JAM OTOMATIS
+            const clockElement = document.getElementById('live-clock-time');
+            function updateVisitorClock() {
+                if (!clockElement) return; 
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hourCycle: 'h23'
+                }).replace(/\./g, ':');
+                clockElement.textContent = timeString;
+            }
+            updateVisitorClock();
+            setInterval(updateVisitorClock, 1000);
+
+            // LOGIKA BARU: KARTU HERO DENGAN CAHAYA MENGIKUTI MOUSE
+            const heroCard = document.getElementById('hero-card');
+            if (heroCard) {
+                const circleLight = heroCard.querySelector('.circle-light');
+                heroCard.addEventListener('mousemove', (e) => {
+                    if (circleLight) {
+                        const rect = heroCard.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        heroCard.style.setProperty('--light-x', `${x}px`);
+                        heroCard.style.setProperty('--light-y', `${y}px`);
+                    }
+                });
+            }
+
+            // LOGIKA BARU: MODAL CV
+            const openCvBtn = document.getElementById('open-cv-modal');
+            const closeCvBtn = document.getElementById('close-cv-modal');
+            const cvModalOverlay = document.getElementById('cv-modal-overlay');
+            const cvPdfEmbed = document.getElementById('cv-pdf-embed');
+            const downloadCvBtn = document.getElementById('download-cv-btn');
+            const pdfUrl = "https://certificate.bernicyesnat.icu/CV_Bernic_Yesnat_2025.pdf";
+
+            if (openCvBtn && closeCvBtn && cvModalOverlay && cvPdfEmbed && downloadCvBtn) {
+                
+                openCvBtn.addEventListener('click', () => {
+                    cvPdfEmbed.src = pdfUrl; 
+                    cvModalOverlay.classList.remove('hidden');
+                    lucide.createIcons(); // Panggil lagi untuk ikon di dalam modal
+                });
+
+                const closeModal = () => {
+                    cvModalOverlay.classList.add('hidden');
+                    cvPdfEmbed.src = "about:blank"; 
+                };
+
+                closeCvBtn.addEventListener('click', closeModal);
+                cvModalOverlay.addEventListener('click', (e) => {
+                    if (e.target === cvModalOverlay) {
+                        closeModal();
+                    }
+                });
+
+                downloadCvBtn.addEventListener('click', () => {
+                    const originalText = downloadCvBtn.innerHTML;
+                    downloadCvBtn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 mr-2 animate-spin"></i>Mengunduh...`;
+                    lucide.createIcons(); 
+
+                    fetch(pdfUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Gagal mengambil PDF, membuka di tab baru.');
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = 'CV_Bernic_Yesnat_2025.pdf';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        a.remove();
+                        downloadCvBtn.innerHTML = originalText;
+                        lucide.createIcons();
+                    })
+                    .catch(error => {
+                        console.warn(error.message);
+                        window.open(pdfUrl, '_blank');
+                        downloadCvBtn.innerHTML = originalText;
+                        lucide.createIcons();
+                    });
+                });
+            }
+            // AKHIR DARI LOGIKA MODAL CV
+
+        }); // AKHIR DARI DOMContentLoaded
+    </script>
+</body>
+</html>
