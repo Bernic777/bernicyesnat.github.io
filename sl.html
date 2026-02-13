@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Surat Lamaran - Ns. Bernic Yesnat, S.Kep</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .surat-container { font-family: 'Merriweather', serif; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .print-area { 
+                box-shadow: none !important; 
+                border: none !important; 
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+            @page { margin: 2.54cm; }
+        }
+
+        .check-anim {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .qr-signature {
+            max-width: 100px;
+            height: auto;
+            margin-bottom: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen pb-10">
+
+    <!-- UI Panel -->
+    <div class="max-w-6xl mx-auto pt-8 px-4 no-print">
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 p-6 text-white flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="bg-blue-600 p-3 rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">HRD Verification Tool v2.1</h1>
+                        <p class="text-slate-400 text-sm">Ns. Bernic Yesnat, S.Kep | Auto-Date Synced</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2.5 rounded-lg font-semibold flex items-center gap-2 transition-all shadow-lg text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
+                        </svg>
+                        Cetak Surat
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row">
+                <!-- Sidebar Form -->
+                <div class="w-full lg:w-96 bg-slate-50 p-6 border-r border-slate-200 overflow-y-auto" style="max-height: 850px;">
+                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Konfigurasi Lamaran</h2>
+                    
+                    <div class="space-y-5">
+                        <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-lg">
+                            <label class="block text-[10px] font-bold text-emerald-700 mb-1 uppercase tracking-wider">Tanggal Sistem Terdeteksi</label>
+                            <p id="system-date-display" class="text-sm font-bold text-emerald-900">—</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Target Instansi</label>
+                            <div class="flex p-1 bg-slate-200 rounded-lg">
+                                <button onclick="setMode('RS')" id="btn-rs" class="flex-1 py-2 text-xs font-bold rounded-md bg-white text-blue-700 shadow-sm transition-all">🏥 RUMAH SAKIT</button>
+                                <button onclick="setMode('PT')" id="btn-pt" class="flex-1 py-2 text-xs font-bold rounded-md text-slate-500 transition-all">🏭 PERUSAHAAN</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 uppercase">Nama Institusi</label>
+                            <input type="text" id="targetName" oninput="updateLetter()" placeholder="Contoh: RS Siloam Manado" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 uppercase">Posisi</label>
+                            <input type="text" id="posisi" oninput="updateLetter()" placeholder="Contoh: Perawat ICU / Occupational Health" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 uppercase">Ditujukan Kepada</label>
+                            <input type="text" id="hrdName" oninput="updateLetter()" placeholder="Contoh: Manajer HRD" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+
+                        <!-- TTE Upload Section -->
+                        <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                            <label class="block text-xs font-bold text-blue-800 mb-2 uppercase flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                                Upload TTE (QR Code)
+                            </label>
+                            <input type="file" id="qrInput" accept="image/*" onchange="handleQRUpload(this)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                            <p class="text-[10px] text-blue-600 mt-2 italic">*QR Code akan muncul secara otomatis di area tanda tangan.</p>
+                        </div>
+
+                        <div class="pt-4 mt-6 border-t border-slate-200">
+                            <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4">Verification Checkpoints</h3>
+                            <div id="validation-list" class="space-y-3">
+                                <!-- Generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Area -->
+                <div class="flex-1 p-8 bg-white overflow-y-auto" style="max-height: 850px;">
+                    <div id="surat-result" class="print-area shadow-sm border border-slate-100 p-12 bg-white text-slate-800 leading-relaxed text-justify">
+                        <!-- Content generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'RS';
+        let qrCodeData = null;
+
+        const data = {
+            name: "Ns. Bernic Yesnat, S.Kep",
+            phone: "(+62) 858-2300-3035",
+            email: "bernicyesnat0106@gmail.com",
+            address: "Minahasa Utara, Sulawesi Utara",
+            web: "cv.bernicyesnat.sbs"
+        };
+
+        const checks = {
+            RS: [
+                "STR & Sertifikasi Keperawatan Valid",
+                "Kompetensi IPSG & Keselamatan Pasien",
+                "Integrasi Rekam Medis Elektronik (RME)",
+                "Protokol PPI & Standar JCI/KARS"
+            ],
+            PT: [
+                "Sertifikasi HIPERKES Paramedis",
+                "Keahlian Keamanan Siber Kesehatan",
+                "Audit Risiko K3 Fisik & Digital",
+                "Manajemen Insiden Data Medis"
+            ]
+        };
+
+        function setMode(mode) {
+            currentMode = mode;
+            const rsBtn = document.getElementById('btn-rs');
+            const ptBtn = document.getElementById('btn-pt');
+            
+            if(mode === 'RS') {
+                rsBtn.className = "flex-1 py-2 text-xs font-bold rounded-md bg-white text-blue-700 shadow-sm transition-all";
+                ptBtn.className = "flex-1 py-2 text-xs font-bold rounded-md text-slate-500 transition-all";
+            } else {
+                ptBtn.className = "flex-1 py-2 text-xs font-bold rounded-md bg-white text-emerald-700 shadow-sm transition-all";
+                rsBtn.className = "flex-1 py-2 text-xs font-bold rounded-md text-slate-500 transition-all";
+            }
+            updateValidationList();
+            updateLetter();
+        }
+
+        function handleQRUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    qrCodeData = e.target.result;
+                    updateLetter();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function updateValidationList() {
+            const list = document.getElementById('validation-list');
+            list.innerHTML = '';
+            checks[currentMode].forEach((check, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-3 check-anim';
+                div.style.animationDelay = (index * 0.1) + 's';
+                div.innerHTML = `
+                    <div class="h-4 w-4 rounded-full bg-blue-100 flex items-center justify-center">
+                        <svg class="h-3 w-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <span class="text-[11px] font-medium text-slate-600 leading-tight">${check}</span>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function updateLetter() {
+            const target = document.getElementById('targetName').value || "[Nama Institusi]";
+            const pos = document.getElementById('posisi').value || "[Posisi]";
+            const hrd = document.getElementById('hrdName').value || "Bapak/Ibu Pimpinan HRD";
+            
+            // Logika Tanggal Sistem Otomatis
+            const now = new Date();
+            const today = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            // Update display tanggal di sidebar
+            document.getElementById('system-date-display').innerText = today;
+
+            let intro = "";
+            let uniqueValue = "";
+
+            if(currentMode === 'RS') {
+                intro = `Sehubungan dengan informasi lowongan pekerjaan di <strong>${target}</strong>, saya menulis surat ini untuk menyatakan ketertarikan saya melamar posisi sebagai <strong>${pos}</strong>. Sebagai seorang Ners Profesional lulusan Universitas Klabat, saya memiliki dedikasi tinggi dalam memberikan pelayanan keperawatan yang berkualitas dan aman bagi pasien.`;
+                uniqueValue = `Selama masa studi profesi saya di RSUP Prof. Dr. R. D. Kandou, saya telah mengasah kompetensi klinis dalam menangani kasus kompleks dengan kepatuhan ketat terhadap 6 Sasaran Keselamatan Pasien (IPSG) serta standar Pencegahan dan Pengendalian Infeksi (PPI). Hal yang membuat profil saya unik dan relevan dengan perkembangan kesehatan modern adalah <strong>literasi digital dan kemampuan saya dalam keamanan siber medis</strong>. Saya sangat memahami krusialnya perlindungan data Rekam Medis Elektronik (RME) dan berkomitmen menjaga privasi pasien secara fisik maupun digital.`;
+            } else {
+                intro = `Melalui surat ini, saya bermaksud mengajukan lamaran pekerjaan untuk posisi <strong>${pos}</strong> di <strong>${target}</strong>. Memiliki latar belakang pendidikan Ners Profesional dengan sertifikasi HIPERKES, saya siap berkontribusi dalam menjaga kesehatan dan keselamatan kerja di lingkungan perusahaan Bapak/Ibu.`;
+                uniqueValue = `Saya bukan hanya seorang tenaga medis, tetapi juga seorang <strong>Inisiator Teknologi Kesehatan</strong> yang aktif sebagai Peneliti Keamanan Siber (Bug Hunter). Keahlian unik ini memungkinkan saya untuk memitigasi risiko kesehatan kerja secara holistik—mulai dari keselamatan fisik karyawan hingga perlindungan aset informasi kesehatan perusahaan. Saya terbiasa bekerja secara kolaboratif dalam tim dan memiliki kemampuan troubleshooting yang tajam dalam situasi krisis.`;
+            }
+
+            const signatureHTML = qrCodeData 
+                ? `<img src="${qrCodeData}" class="qr-signature" alt="TTE QR Code"><p class="text-[10px] text-slate-400 italic mb-2">Tanda Tangan Elektronik Terverifikasi</p>` 
+                : `<div class="h-20"></div>`;
+
+            const fullSurat = `
+                <div class="surat-container text-sm md:text-base" style="color: #1e293b;">
+                    <p class="text-right mb-10">Minahasa Utara, ${today}</p>
+                    
+                    <div class="mb-10">
+                        <p>Perihal: <strong>Lamaran Pekerjaan – ${pos}</strong></p>
+                    </div>
+
+                    <div class="mb-10">
+                        <p>Kepada Yth.,</p>
+                        <p><strong>${hrd}</strong></p>
+                        <p><strong>${target}</strong></p>
+                        <p>di Tempat</p>
+                    </div>
+
+                    <p class="mb-6">Dengan hormat,</p>
+
+                    <p class="mb-6">${intro}</p>
+
+                    <p class="mb-6 text-justify">${uniqueValue}</p>
+
+                    <p class="mb-6">Saya adalah pribadi yang disiplin, responsif, dan menjunjung tinggi kode etik profesi. Saya sangat antusias untuk mendiskusikan bagaimana kualifikasi serta visi saya dalam mengintegrasikan teknologi dan layanan kesehatan dapat mendukung operasional <strong>${target}</strong>.</p>
+                    
+                    <p class="mb-6">Sebagai bahan pertimbangan, saya melampirkan Curriculum Vitae dan dokumen pendukung. Portofolio digital saya juga dapat diakses melalui <em>${data.web}</em>.</p>
+                    
+                    <p class="mb-12">Atas perhatian dan kesempatan yang Bapak/Ibu berikan, saya ucapkan terima kasih.</p>
+
+                    <div class="mt-16">
+                        <p>Hormat saya,</p>
+                        ${signatureHTML}
+                        <p><strong>${data.name}</strong></p>
+                        <p class="text-sm text-slate-500">${data.phone}</p>
+                        <p class="text-sm text-slate-500">${data.email}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('surat-result').innerHTML = fullSurat;
+        }
+
+        window.onload = () => {
+            updateValidationList();
+            updateLetter();
+        };
+    </script>
+</body>
+</html>
